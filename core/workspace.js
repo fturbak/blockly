@@ -133,7 +133,7 @@ Blockly.Workspace.prototype.addTopBlock = function(block) {
 };
 
 /**
- * Remove a block from the list of top blocks.
+* Remove a block from the list of top blocks.
  * @param {!Blockly.Block} block Block to remove.
  */
 Blockly.Workspace.prototype.removeTopBlock = function(block) {
@@ -457,8 +457,10 @@ Blockly.Workspace.prototype.removeChangeListener = function(func) {
  * @param {!Blockly.Events.Abstract} event Event to fire.
  */
 Blockly.Workspace.prototype.fireChangeListener = function(event) {
-  console.log("Blockly.Workspace.prototype.fireChangeListener"); //*** lyn 
-  console.log("event=" + JSON.stringify(event.toJson())); //*** lyn 
+  // console.log("Blockly.Workspace.prototype.fireChangeListener"); //*** lyn 
+  // console.log("event=" + JSON.stringify(event.toJson())); //*** lyn
+  // Blockly.Workspace.recordEvent(event);
+  this.recordEvent(event);
   if (event.recordUndo) {
     this.undoStack_.push(event);
     this.redoStack_.length = 0;
@@ -470,6 +472,49 @@ Blockly.Workspace.prototype.fireChangeListener = function(event) {
     func(event);
   }
 };
+
+/**
+ *
+ * Lyn's helper function for recording events on remote server
+ *
+ */
+Blockly.Workspace.prototype.recordEvent = function(event) {
+    var CGI_URL = "http://cs.wellesley.edu/~codeblocks/cgi-bin/code-blocks-study/recordEvents.cgi"
+    var payload = event.toJson();
+    var payloadString = JSON.stringify(payload);
+    console.log("Blockly.Workspace.recordEvent payloadString: " + payloadString);    
+    var data = {'payload': payloadString}
+    var dataEncoded = new URLSearchParams(data)
+    fetch(CGI_URL, {
+        body: dataEncoded,
+        method: "POST",
+        mode: "no-cors", // Don't need to access response data. 
+        headers: {"Content-Type": "application/x-www-form-urlencoded"}
+    })
+    /* // ant processing in YaClientApp does not like the following JavaScript syntax,
+       so I need to change it 
+        .then ((response) => {
+            console.log("Blockly.Workspace.recordEvent response status: " + response.status + " " + response.statusText); 
+            return response.text();
+        })
+        .then ((text) => console.log("Blockly.Workspace.recordEvent response text " + text))
+    */
+    // Note: with "no-cors" set above, the response cannot be read (but that's OK,
+    // since we're just writing to remove server not reading from it). 
+	.then(function (response) {
+	    console.log("Blockly.Workspace.recordEvent response status: " + response.status + " " + response.statusText);
+	    return response.text();
+	})
+        .then (function (text) {
+	    console.log("Blockly.Workspace.recordEvent response text " + text);
+	});
+    /* Treats "catch" in ".catch" as a keyword, so just comment this out: 
+	.catch (function () {
+	    console.log("***Exception in Blockly.Workspace.recordEvent***");
+	    });
+    */
+	    
+}
 
 /**
  * Find the block on this workspace with the specified ID.

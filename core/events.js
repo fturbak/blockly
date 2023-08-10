@@ -364,8 +364,8 @@ Blockly.Events.Abstract.getCurrentTimeString = function () {
     var milliseconds = pad(3, time.getMilliseconds());
     // ant processing does not like template strings :-(
     // return `${year}-${month}-${date}-${hour}-${minutes}-${seconds}-${milliseconds}`;
-    return year + "-" + month + "-" + hour + "-"
-           + minutes + "-" + seconds + "-" + milliseconds;
+    return year + "-" + month + "-" + date + "-" 
+           + hour + "-" + minutes + "-" + seconds + "-" + milliseconds;
 }
 
 /**
