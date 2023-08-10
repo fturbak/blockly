@@ -411,6 +411,7 @@ Blockly.Field.prototype.getText = function() {
  * @param {*} newText New text.
  */
 Blockly.Field.prototype.setText = function(newText) {
+  console.log("Blockly.Field.prototype.setText; newText=\"" + newText + "\""); 
   if (newText === null) {
     // No change if null.
     return;
@@ -425,6 +426,7 @@ Blockly.Field.prototype.setText = function(newText) {
   this.size_.width = 0;
 
   if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+    console.log("Calling this.sourceBlock.render() from Blockly.Field.prototype.setText");
     this.sourceBlock_.render();
     this.sourceBlock_.bumpNeighbours_();
   }

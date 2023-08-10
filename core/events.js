@@ -102,9 +102,11 @@ Blockly.Events.FIRE_TIMER_ = undefined;
  * @param {!Blockly.Events.Abstract} event Custom data for event.
  */
 Blockly.Events.fire = function(event) {
+  // console.log("Blockly.Events.fire: event=" + JSON.stringify(event.toJson())); //*** lyn
   if (!Blockly.Events.isEnabled()) {
     return;
   }
+  // console.log("Blockly.Events.fire: events are enabled"); //*** lyn
   Blockly.Events.FIRE_QUEUE_.push(event);
   if (!Blockly.Events.FIRE_TIMER_) {
     // First event added; schedule a firing of the event queue.
@@ -120,9 +122,11 @@ Blockly.Events.fire = function(event) {
  * @private
  */
 Blockly.Events.fireNow_ = function() {
+  // console.log("Blockly.Events.fireNow_"); //*** lyn
   var queue = Blockly.Events.filter(Blockly.Events.FIRE_QUEUE_, true);
   Blockly.Events.FIRE_QUEUE_.length = 0;
   for (var i = 0, event; event = queue[i]; i++) {
+    // console.log("queue[" + i + "]=" + JSON.stringify(event.toJson()));
     var workspace = Blockly.Workspace.getById(event.workspaceId);
     if (workspace) {
       workspace.fireChangeListener(event);
@@ -303,6 +307,9 @@ Blockly.Events.fromJson = function(json, workspace) {
  * @constructor
  */
 Blockly.Events.Abstract = function(block) {
+  // console.log("new Blockly.Events.Abstract for block"); //*** lyn
+  // console.log(block);
+  // console.log("abstract event this=" + JSON.stringify(this.toJson()));
   if (block) {
     this.blockId = block.id;
     this.workspaceId = block.workspace.id;
@@ -318,6 +325,7 @@ Blockly.Events.Abstract = function(block) {
 Blockly.Events.Abstract.prototype.toJson = function() {
   var json = {
     'type': this.type,
+    'timestamp': Blockly.Events.Abstract.getCurrentTimeString()
   };
   if (this.blockId) {
     json['blockId'] = this.blockId;
@@ -327,6 +335,38 @@ Blockly.Events.Abstract.prototype.toJson = function() {
   }
   return json;
 };
+
+/**
+ * Added by lyn for Code Blocks User Study for timestamps in recording events.
+ * @return {!String} String representation of current time 
+ */
+Blockly.Events.Abstract.getCurrentTimeString = function () {
+    /** Pad a number into a string with leading zeroes */
+    function pad(width, num) {
+	if (num >= Math.pow(10, width) || num < 0) { // ant processing doesn't likle 10**width	
+            return num.toString();
+	}
+	result = "";
+	while ((width > 0) && (num < Math.pow(10, width-1))) { // ant processing doesn't like 10**(width-1)	
+            result += "0";
+	    width -= 1;
+	}
+	result += num.toString();
+	return result;
+    }
+    var time = new Date();
+    var year = time.getFullYear();
+    var month = pad(2, time.getMonth() + 1); // getMonth() is zero based                                                            
+    var date = pad(2, time.getDate());
+    var hour = pad(2, time.getHours());
+    var minutes = pad(2, time.getMinutes());
+    var seconds = pad(2, time.getSeconds());
+    var milliseconds = pad(3, time.getMilliseconds());
+    // ant processing does not like template strings :-(
+    // return `${year}-${month}-${date}-${hour}-${minutes}-${seconds}-${milliseconds}`;
+    return year + "-" + month + "-" + hour + "-"
+           + minutes + "-" + seconds + "-" + milliseconds;
+}
 
 /**
  * Decode the JSON event.
@@ -360,12 +400,18 @@ Blockly.Events.Abstract.prototype.run = function(forward) {
  * @constructor
  */
 Blockly.Events.Create = function(block) {
+  // console.log("new Blockly.Events.Create for block"); //*** lyn
+    console.log(block);
   if (!block) {
     return;  // Blank event to be populated by fromJson.
   }
   Blockly.Events.Create.superClass_.constructor.call(this, block);
   this.xml = Blockly.Xml.blockToDomWithXY(block);
   this.ids = Blockly.Events.getDescendantIds_(block);
+  // console.log("event this:"); //*** lyn
+  // console.log(this);
+  // console.log("event this=" + JSON.stringify(this.toJson()));
+    
 };
 goog.inherits(Blockly.Events.Create, Blockly.Events.Abstract);
 
@@ -379,7 +425,7 @@ Blockly.Events.Create.prototype.type = Blockly.Events.CREATE;
  * Encode the event as JSON.
  * @return {!Object} JSON representation.
  */
-Blockly.Events.Create.prototype.toJson = function() {
+Blockly.Events.Create.prototype.toJson= function() {
   var json = Blockly.Events.Create.superClass_.toJson.call(this);
   json['xml'] = Blockly.Xml.domToText(this.xml);
   json['ids'] = this.ids;
@@ -426,6 +472,9 @@ Blockly.Events.Create.prototype.run = function(forward) {
  * @constructor
  */
 Blockly.Events.Delete = function(block) {
+  // console.log("new Blockly.Events.Delete for block"); //*** lyn
+  // console.log(block);
+  // console.log("event this=" + JSON.stringify(this.toJson()));
   if (!block) {
     return;  // Blank event to be populated by fromJson.
   }
@@ -497,6 +546,9 @@ Blockly.Events.Delete.prototype.run = function(forward) {
  * @constructor
  */
 Blockly.Events.Change = function(block, element, name, oldValue, newValue) {
+  // console.log("new Blockly.Events.Change for block"); //*** lyn
+  // console.log(block);
+  // console.log("event this=" + JSON.stringify(this.toJson()));
   if (!block) {
     return;  // Blank event to be populated by fromJson.
   }
@@ -615,6 +667,9 @@ Blockly.Events.Change.prototype.run = function(forward) {
  * @constructor
  */
 Blockly.Events.Move = function(block) {
+  // console.log("new Blockly.Events.Move for block"); //*** lyn
+  // console.log(block);
+  // console.log("event this=" + JSON.stringify(this.toJson()));
   if (!block) {
     return;  // Blank event to be populated by fromJson.
   }
@@ -766,6 +821,9 @@ Blockly.Events.Move.prototype.run = function(forward) {
  * @constructor
  */
 Blockly.Events.Ui = function(block, element, oldValue, newValue) {
+  // console.log("new Blockly.Events.Ui for block"); //*** lyn
+  // console.log(block);
+  // console.log("event this=" + JSON.stringify(this.toJson()));
   Blockly.Events.Ui.superClass_.constructor.call(this, block);
   this.element = element;
   this.oldValue = oldValue;

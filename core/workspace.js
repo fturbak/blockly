@@ -457,6 +457,8 @@ Blockly.Workspace.prototype.removeChangeListener = function(func) {
  * @param {!Blockly.Events.Abstract} event Event to fire.
  */
 Blockly.Workspace.prototype.fireChangeListener = function(event) {
+  console.log("Blockly.Workspace.prototype.fireChangeListener"); //*** lyn 
+  console.log("event=" + JSON.stringify(event.toJson())); //*** lyn 
   if (event.recordUndo) {
     this.undoStack_.push(event);
     this.redoStack_.length = 0;

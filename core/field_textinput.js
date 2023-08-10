@@ -77,6 +77,7 @@ Blockly.FieldTextInput.prototype.value_ = null;
  * Close the input widget if this input is being deleted.
  */
 Blockly.FieldTextInput.prototype.dispose = function() {
+  console.log("Blockly.FieldTextInput.prototype.dispose calls Blockly.WidgetDiv.hideIfOwner"); //***lyn
   Blockly.WidgetDiv.hideIfOwner(this);
   Blockly.FieldTextInput.superClass_.dispose.call(this);
 };
@@ -193,12 +194,15 @@ Blockly.FieldTextInput.prototype.onHtmlInputKeyDown_ = function(e) {
   var tabKey = 9, enterKey = 13, escKey = 27;
   if (e.keyCode == enterKey) {
     this.setValue(this.getText());
+    console.log("Blockly.FieldTextInput.prototype.onHtmlInputKeyDown_ calls Blockly.WidgetDiv.hide() from enter key"); //***lyn
     Blockly.WidgetDiv.hide();
   } else if (e.keyCode == escKey) {
     htmlInput.value = htmlInput.defaultValue;
+    console.log("Blockly.FieldTextInput.prototype.onHtmlInputKeyDown_ calls Blockly.WidgetDiv.hide() from esc key"); //***lyn
     Blockly.WidgetDiv.hide();
   } else if (e.keyCode == tabKey) {
     this.setValue(this.getText());
+    console.log("Blockly.FieldTextInput.prototype.onHtmlInputKeyDown_ calls Blockly.WidgetDiv.hide() from tab key"); //***lyn      
     Blockly.WidgetDiv.hide();
     this.sourceBlock_.tab(this, !e.shiftKey);
     e.preventDefault();
@@ -211,19 +215,25 @@ Blockly.FieldTextInput.prototype.onHtmlInputKeyDown_ = function(e) {
  * @private
  */
 Blockly.FieldTextInput.prototype.onHtmlInputChange_ = function(e) {
+  console.log("Blockly.FieldTextInput.prototype.onHtmlInputChange_"); //***lyn      
   var htmlInput = Blockly.FieldTextInput.htmlInput_;
   // Update source block.
   var text = htmlInput.value;
   if (text !== htmlInput.oldValue_) {
     htmlInput.oldValue_ = text;
+    console.log("Blockly.FieldTextInput.prototype.onHtmlInputChange_ calling this.setText"); //***lyn
     this.setText(text);
+    console.log("Blockly.FieldTextInput.prototype.onHtmlInputChange_ calling this.validatesetText"); //***lyn      
     this.validate_();
   } else if (goog.userAgent.WEBKIT) {
     // Cursor key.  Render the source block to show the caret moving.
     // Chrome only (version 26, OS X).
+    console.log("Blockly.FieldTextInput.prototype.onHtmlInputChange_ calling this.sourceBlock.render_"); //***lyn
     this.sourceBlock_.render();
   }
+  console.log("Blockly.FieldTextInput.prototype.onHtmlInputChange_ calling this.resizeEditor_"); //***lyn          
   this.resizeEditor_();
+  console.log("Blockly.FieldTextInput.prototype.onHtmlInputChange_ calling Blockly.svgResize"); //***lyn              
   Blockly.svgResize(this.sourceBlock_.workspace);
 };
 
@@ -285,6 +295,7 @@ Blockly.FieldTextInput.prototype.resizeEditor_ = function() {
  * @private
  */
 Blockly.FieldTextInput.prototype.widgetDispose_ = function() {
+  console.log("Blockly.FieldTextInput.prototype.widgetDispose_");
   var thisField = this;
   return function() {
     var htmlInput = Blockly.FieldTextInput.htmlInput_;
